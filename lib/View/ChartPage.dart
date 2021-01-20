@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mood/View/FavoritesPage.dart';
 import 'package:web_scraper/web_scraper.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -44,32 +46,39 @@ class _ChartPageState extends State<ChartPage> {
           _musicsChart = snapshot.data;
           if (snapshot.hasData) {
             if (snapshot.data != null) {
-              return SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(
-                children: _musicsChart.sublist(0, 4).map((music) => Container(
-                  width: 130,
-                  padding: EdgeInsets.symmetric(vertical: 0, horizontal: 5),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(2),
-                        child: Image.network(music["image"],
-                          height: 100,
-                          width: 100,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Text(music["title"], overflow: TextOverflow.ellipsis, style: TextStyle(
-                          fontSize: 18,
-                        color: Colors.grey
-                      ),),
-                      Text(music["artist"], overflow: TextOverflow.ellipsis, style: TextStyle(
-                        color: Colors.grey
-                      ),)
-                    ],
-                  ),
+              /*return Column(
+                children: _musicsChart.sublist(0, 4).map((music) => ListTile(
+                  title: Text(music["title"]),
+                  l
                 )).toList()
-              ));
+              );*/
+              return ListView.separated(
+                shrinkWrap: true,
+                itemCount: 4,
+                itemBuilder: (context, i) {
+                  return ListTile(
+                    leading: Image.network(
+                      _musicsChart[i]["image"],
+                      height: 50,
+                      width: 50,
+                      fit: BoxFit.cover,
+                    ),
+                    title: Text(_musicsChart[i]["title"], overflow: TextOverflow.ellipsis,),
+                    subtitle: Text(_musicsChart[i]["artist"], overflow: TextOverflow.ellipsis,),
+                    trailing: Text((i+1).toString(), style: TextStyle(
+                      color: Colors.grey
+                    ),),
+                  );
+                },
+                separatorBuilder: (context, i) {
+                  return Divider(
+                    height: 1,
+                    color: Colors.black,
+                    endIndent: 30,
+                    indent: 30,
+                  );
+                },
+              );
             } else {
               return Center(
                 child: Text("Sorry! will can't resolve data"),
@@ -93,51 +102,57 @@ class _ChartPageState extends State<ChartPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          SizedBox(height: 10,),
-          ListTile(
-            onTap: () => {},
-            title: Text("Top musics", style: TextStyle(
-              fontSize: 20,
-              color: Theme.of(context).primaryColor
-            ),),
-            trailing: Icon(Icons.navigate_next, color: Theme.of(context).primaryColor,),
-          ),
-          _widgetMusicChart(),
-          SizedBox(height: 10,),
-          ListTile(
-            onTap: () => {},
-            title: Text("Recently listen", style: TextStyle(
-                fontSize: 20,
-                color: Theme.of(context).primaryColor
-            ),),
-            trailing: Icon(Icons.navigate_next, color: Theme.of(context).primaryColor,),
-          ),
-          SizedBox(height: 10,),
-          ListTile(
-            onTap: () => {},
-            title: Text("Playlists", style: TextStyle(
-                fontSize: 20,
-                color: Theme.of(context).primaryColor
-            ),),
-            trailing: Icon(Icons.navigate_next, color: Theme.of(context).primaryColor,),
-          ),
-          Column(
-            children: [
-              ListTile(
-                onTap: () => {},
-                title: Text("Favorites"),
-                trailing: Icon(Icons.favorite),
-              ),
-              ListTile(
-                onTap: () => {},
-                title: Text("Recently added"),
-                trailing: Icon(Icons.access_time),
-              )
-            ],
-          )
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(height: 10,),
+            ListTile(
+              onTap: () => {},
+              title: Text("Top musics", style: TextStyle(
+                  fontSize: 25,
+                  color: Theme.of(context).primaryColor
+              ),),
+              trailing: Icon(Icons.navigate_next, color: Theme.of(context).primaryColor,),
+            ),
+            _widgetMusicChart(),
+            SizedBox(height: 10,),
+            ListTile(
+              onTap: () => {},
+              title: Text("Recently listened", style: TextStyle(
+                  fontSize: 25,
+                  color: Theme.of(context).primaryColor
+              ),),
+              trailing: Icon(Icons.navigate_next, color: Theme.of(context).primaryColor,),
+            ),
+            SizedBox(height: 10,),
+            ListTile(
+              onTap: () => {},
+              title: Text("Playlists", style: TextStyle(
+                  fontSize: 25,
+                  color: Theme.of(context).primaryColor
+              ),),
+              trailing: Icon(Icons.navigate_next, color: Theme.of(context).primaryColor,),
+            ),
+            Column(
+              children: [
+                ListTile(
+                  onTap: () => Navigator.push(context, CupertinoPageRoute(
+                      builder: (BuildContext context) {
+                        return FavoritesPage();
+                      }
+                  )),
+                  title: Text("Favorites"),
+                  trailing: Icon(Icons.favorite),
+                ),
+                ListTile(
+                  onTap: () => {},
+                  title: Text("Offline"),
+                  trailing: Icon(Icons.download_done_outlined),
+                )
+              ],
+            )
+          ],
+        ),
       ),
     );
   }

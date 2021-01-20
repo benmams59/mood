@@ -9,6 +9,7 @@ import 'dart:convert';
 
 import 'package:mood/Style/Style.dart';
 import 'package:mood/View/AlbumPage.dart';
+import 'package:mood/View/DiscographiePage.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:mood/Model/MoodModel.dart';
 
@@ -29,7 +30,6 @@ class _ArtistPageState extends State<ArtistPage> {
 
     if (request.statusCode == 200) {
       request = jsonDecode(request.body)["data"];
-      print(widget.artist["tracklist"]);
       for (int i = 0; i < request.length; i++) {
         if (!_data.keys.contains(request[i]["album"]["title"])) {
           _data[request[i]["album"]["title"]] =
@@ -187,14 +187,27 @@ class _ArtistPageState extends State<ArtistPage> {
                 children: [
                   SizedBox(height: 10,),
                   ListTile(
-                    onTap: () => {},
+                    onTap: () => _data.isNotEmpty && _data.keys.length < 5 ? {} : {
+                      Navigator.push(context, CupertinoPageRoute(
+                          builder: (BuildContext context) {
+                              return DiscographiePage(_data, artist: widget.artist["name"],);
+                          }
+                      ))
+                    },
                     title: Text(
                       "Discographie",
                       style: TextStyle(
                           fontSize: 22
                       ),
                     ),
-                    trailing: Icon(Icons.arrow_forward_ios),
+                    trailing: _data.isNotEmpty && _data.keys.length > 5 ? FittedBox(
+                      child: Row(
+                        children: [
+                          Text("+${_data.keys.length-5}"),
+                          Icon(Icons.arrow_forward_ios)
+                        ],
+                      ),
+                    ) : Container(),
                   ),
                   Container(
                     padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),

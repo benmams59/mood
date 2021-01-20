@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
-import 'package:mood/Scripts/FavoriteDB.dart';
-import 'package:mood/Scripts/FavoriteModel.dart';
+import 'package:mood/Helpers/FavoriteDB.dart';
+import 'package:mood/Helpers/FavoriteModel.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 

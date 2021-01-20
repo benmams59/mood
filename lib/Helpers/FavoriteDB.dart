@@ -1,6 +1,6 @@
 import "dart:async";
 
-import 'package:mood/Scripts/FavoriteModel.dart';
+import 'package:mood/Helpers/FavoriteModel.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -33,7 +33,6 @@ class FavoriteDB {
     for (int i = 0; i < maps.length; i++) {
       newMaps.addAll({maps[i]["key"]: maps[i]});
     }
-    print(newMaps);
     return newMaps;
 
     /*return List.generate(maps.length, (i) {
