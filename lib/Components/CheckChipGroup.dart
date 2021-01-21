@@ -18,6 +18,7 @@ class _CheckChipGroupState extends State<CheckChipGroup> {
       Chip chip = Chip(
         key: widget.children[i].key,
         label: widget.children[i].label,
+        elevation: 2,
         backgroundColor: i == _selected ? Colors.black : Colors.white,
         labelStyle: TextStyle(color: i == _selected ? Colors.white : Colors.black),
         onDeleted: i == _selected ? null : () => {

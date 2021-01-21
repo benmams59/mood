@@ -57,7 +57,7 @@ class _HomePageState extends State<HomePage> {
         floatingActionButton: FloatingController(),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Color.fromRGBO(245, 245, 245, 1),
           brightness: Brightness.light,
           title: Row(
             children: [

@@ -128,7 +128,11 @@ class FavoritesPageState extends State<FavoritesPage> {
                   clipBehavior: Clip.antiAliasWithSaveLayer,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
+                    border: Border(top: BorderSide(
+                      color: Colors.black12,
+                      style: BorderStyle.solid,
+                      width: 1
+                    ))
                   ),
                   child: NotificationListener<ScrollNotification>(
                     onNotification: (scrollNotification) {

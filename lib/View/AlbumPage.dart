@@ -27,6 +27,7 @@ class _AlbumPageState extends State<AlbumPage> {
 
   ScrollController _scrollController = ScrollController();
   double _scrollOffset = 0;
+  int _length = null;
   
   Future<List> _getAlbumTracklist() async {
     final request = await http.get("https://api.deezer.com/album/${widget.id}/tracks");
@@ -35,6 +36,7 @@ class _AlbumPageState extends State<AlbumPage> {
       FavoriteDB favoriteDB = FavoriteDB();
       await favoriteDB.init();
       _favorites = await favoriteDB.favorites();
+      setState(() {_length = jsonDecode(request.body)["data"].length;});
       return jsonDecode(request.body)["data"];
     }
   }
@@ -110,6 +112,66 @@ class _AlbumPageState extends State<AlbumPage> {
     });
   }
 
+  Widget _TrackItem(data, model) {
+    return ListTileTheme(
+      selectedColor: Theme.of(context).accentColor,
+      child: ListTile(
+        selected: model.trackInfo != null ? model.trackInfo["id"] == data["id"] : false,
+        onTap: () => _onTrackTapped(data),
+        title: Text(data["title"], overflow: TextOverflow.ellipsis,),
+        trailing: FittedBox(
+          fit: BoxFit.fill,
+          child: Row(
+            children: <Widget>[
+              _favorites.keys.contains(data["id"]) ?
+              IconButton(
+                onPressed: () => _removeToFavorite(data),
+                icon: Icon(Icons.favorite, color: Theme.of(context).accentColor,),
+              ) :
+              IconButton(
+                onPressed: () => _addToFavorite(data),
+                icon: Icon(Icons.favorite_border),
+              ),
+              IconButton(
+                onPressed: () => {
+                  showModalBottomSheet<void>(
+                      context: context,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(10),)
+                      ),
+                      isScrollControlled: true,
+                      builder: (BuildContext context) {
+                        return Wrap(
+                            children: [
+                              ListTile(
+                                onTap: () {
+                                  if (_favorites.keys.contains(data["id"]))
+                                    _removeToFavorite(data);
+                                  else _addToFavorite(data);
+                                  Navigator.pop(context);
+                                },
+                                title: Text("${_favorites.keys.contains(data["id"]) ? "Remove" : "Add"} to favorites"),
+                              ),
+                              ListTile(
+                                title: Text("Add to a playlist"),
+                              ),
+                              ListTile(
+                                title: Text("Report"),
+                              ),
+                            ]
+                        );
+                      }
+                  )
+                },
+                icon: Icon(Icons.more_vert),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,39 +184,90 @@ class _AlbumPageState extends State<AlbumPage> {
           height: 250 - (_scrollOffset + (50 * (_scrollOffset / 100))),
           padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
           child: Stack(
+            fit: StackFit.loose,
             children: [
-              Positioned(
-                top: 0 + (_scrollOffset/(100/17)),
-                child: Container(
-                  child: IconButton(
-                    onPressed: () => { Navigator.pop(context) },
-                    icon: Icon(Icons.arrow_back),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 50 - (_scrollOffset/(100/20)),
-                left: 20 + ((_scrollOffset/(100/20))),
-                child: Container(
-                  child: Text(
-                    "${widget.artist} - ${widget.album[0]}",
-                    style: TextStyle(
-                      fontSize: 25 - (_scrollOffset/15),
-                      color: Colors.black54
+              SingleChildScrollView(
+                child: Opacity(
+                  opacity: 1 - (_scrollOffset/100),
+                  child: Container(
+                    clipBehavior: Clip.antiAliasWithSaveLayer,
+                    decoration: BoxDecoration(),
+                    alignment: Alignment.topLeft,
+                    margin: EdgeInsets.fromLTRB(0, 0, 0, 50),
+                    padding: EdgeInsets.all(10),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.network(
+                            widget.album[1],
+                            width: 140,
+                            height: 140,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        SizedBox(width: 20,),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width - 180,
+                              child: Text(
+                                widget.artist,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width - 180,
+                              child: Text(
+                                widget.album[0],
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width - 180,
+                              child: Text(
+                                "${_length == null ? "-" : _length.toString()} titles",
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
                     ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: _scrollOffset < 50 ? 2 : 1,
-                    textAlign: TextAlign.center,
                   ),
-                  width: MediaQuery.of(context).size.width - (40 + (_scrollOffset/(100/140))),
                 ),
               ),
-              Positioned(
-                top: 160 - (_scrollOffset/(100/145)),
-                right: 0,
+              Container(
+                alignment: Alignment.bottomCenter,
+                padding: EdgeInsets.symmetric(vertical: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    IconButton(
+                      onPressed: () => { Navigator.pop(context) },
+                      icon: Icon(Icons.arrow_back),
+                    ),
+                    Opacity(
+                      opacity: 0 + (_scrollOffset/100),
+                      child: Container(
+                        child: Text(
+                          "${widget.artist} - ${widget.album[0]}",
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.black54
+                          ),
+                        ),
+                        width: MediaQuery.of(context).size.width - 200,
+                      ),
+                    ),
                     IconButton(
                         icon: Icon(Icons.shuffle),
                         color: Colors.black54,
@@ -182,99 +295,67 @@ class _AlbumPageState extends State<AlbumPage> {
           ),
         ),
       ),
-      body: Container(
-        padding: EdgeInsets.fromLTRB(0, 0, 0, 60),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20))
-        ),
-        child: FutureBuilder(
-          initialData: null,
-          future: _getAlbumTracklist(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.hasData) {
-              if (snapshot.data != null) {
-                return ScopedModelDescendant<AppModel>(
+      body: FutureBuilder(
+        initialData: null,
+        future: _getAlbumTracklist(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.hasData) {
+            if (snapshot.data != null) {
+              return ScopedModelDescendant<AppModel>(
                   builder: (context, child, model) {
-                    return NotificationListener<ScrollNotification>(
-                      onNotification: (scrollNotification) {
-                        if (scrollNotification is ScrollStartNotification) {
-                          _onStartScroll(scrollNotification.metrics);
-                        } else if (scrollNotification is ScrollUpdateNotification) {
-                          _onUpdateScroll(scrollNotification.metrics);
-                        } else if (scrollNotification is ScrollEndNotification) {
-                          _onEndScroll(scrollNotification.metrics);
-                        }
-                        return true;
-                      },
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        itemCount: snapshot.data.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return ListTileTheme(
-                            selectedColor: Theme.of(context).accentColor,
-                            child: ListTile(
-                              selected: model.trackInfo != null ? model.trackInfo["id"] == snapshot.data[index]["id"] : false,
-                              onTap: () => _onTrackTapped(snapshot.data[index]),
-                              title: Text(snapshot.data[index]["title"], overflow: TextOverflow.ellipsis,),
-                              trailing: FittedBox(
-                                fit: BoxFit.fill,
-                                child: Row(
-                                  children: <Widget>[
-                                    _favorites.keys.contains(snapshot.data[index]["id"]) ?
-                                    IconButton(
-                                      onPressed: () => _removeToFavorite(snapshot.data[index]),
-                                      icon: Icon(Icons.favorite, color: Theme.of(context).accentColor,),
-                                    ) :
-                                    IconButton(
-                                      onPressed: () => _addToFavorite(snapshot.data[index]),
-                                      icon: Icon(Icons.favorite_border),
-                                    ),
-                                    IconButton(
-                                      onPressed: () => {
-                                        showModalBottomSheet<void>(
-                                            context: context,
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.vertical(top: Radius.circular(10),)
-                                            ),
-                                            isScrollControlled: true,
-                                            builder: (BuildContext context) {
-                                              return Wrap(
-                                                  children: [
-                                                    ListTile(
-                                                      title: Text("Add to favorites"),
-                                                    ),
-                                                    ListTile(
-                                                      title: Text("Add to a playlist"),
-                                                    ),
-                                                    ListTile(
-                                                      title: Text("Report"),
-                                                    ),
-                                                  ]
-                                              );
-                                            }
-                                        )
-                                      },
-                                      icon: Icon(Icons.more_vert),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        //borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                        border: Border(top: BorderSide(color: Colors.black12, width: 1, style: BorderStyle.solid))
+                      ),
+                      child: NotificationListener<ScrollNotification>(
+                        onNotification: (scrollNotification) {
+                          if (scrollNotification is ScrollStartNotification) {
+                            _onStartScroll(scrollNotification.metrics);
+                          } else if (scrollNotification is ScrollUpdateNotification) {
+                            _onUpdateScroll(scrollNotification.metrics);
+                          } else if (scrollNotification is ScrollEndNotification) {
+                            _onEndScroll(scrollNotification.metrics);
+                          }
+                          return true;
                         },
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          itemCount: snapshot.data.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            if (snapshot.data.length-1 == index) {
+                              return Column(
+                                children: [
+                                  _TrackItem(snapshot.data[index], model),
+                                  SizedBox(height: 100,)
+                                ],
+                              );
+                            } else
+                              return _TrackItem(snapshot.data[index], model);
+                          },
+                        ),
                       ),
                     );
                   }
-                );
-              } else {
-                return Center(child: Text("No data found"));
-              }
+              );
             } else {
-              return Center(child: CircularProgressIndicator(),);
+              return Center(child: Text("No data found"));
             }
-          },
-        ),
+          } else {
+            return Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border(top: BorderSide(
+                  color: Colors.black12,
+                  style: BorderStyle.solid,
+                  width: 1
+                ))
+              ),
+              child: Center(child: CircularProgressIndicator(),
+            ),);
+          }
+        },
       )
     );
   }

@@ -36,9 +36,9 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: Colors.white,
           primarySwatch: Colors.pink,
           accentColor: Colors.pinkAccent,
-          backgroundColor: Colors.white,
+          backgroundColor: Color.fromRGBO(245, 245, 245, 1),
           chipTheme: ChipThemeData(
-            backgroundColor: Colors.white,
+            backgroundColor: Color.fromRGBO(245, 245, 245, 1),
             disabledColor: Colors.black12,
             selectedColor: Colors.grey,
             secondarySelectedColor: Colors.black45,
@@ -49,8 +49,8 @@ class MyApp extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
                 side: BorderSide(
-                  color: Colors.grey,
-                  width: 1,
+                  color: Colors.transparent,
+                  width: 0,
                   style: BorderStyle.solid
                 )
             )

@@ -67,6 +67,7 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
     return _songs.isNotEmpty || _artists.isNotEmpty || _albums.isNotEmpty ?
         SingleChildScrollView(scrollDirection: Axis.vertical, child: Center(
             child: Container(
+              color: Color.fromRGBO(245, 245, 245, 1),
               padding: EdgeInsets.symmetric(vertical: 0, horizontal: 5),
               child: Column(
                 children: [
@@ -81,7 +82,11 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
                     ]
                   ),
                   SizedBox(height: 10),
-                  Text("Results of ${widget.query}", style: Style.h1,),
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    margin: EdgeInsets.symmetric(horizontal: 10),
+                    child: Text("Results of ${widget.query}", style: Style.h1,),
+                  ),
                   SizedBox(height: 20,),
                   Column(
                     children: [

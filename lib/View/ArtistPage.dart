@@ -186,8 +186,9 @@ class _ArtistPageState extends State<ArtistPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 10,),
-                  ListTile(
-                    onTap: () => _data.isNotEmpty && _data.keys.length < 5 ? {} : {
+                  if (_data.isNotEmpty)
+                    ListTile(
+                    onTap: () => _data.keys.length < 5 ? {} : {
                       Navigator.push(context, CupertinoPageRoute(
                           builder: (BuildContext context) {
                               return DiscographiePage(_data, artist: widget.artist["name"],);
@@ -200,14 +201,17 @@ class _ArtistPageState extends State<ArtistPage> {
                           fontSize: 22
                       ),
                     ),
-                    trailing: _data.isNotEmpty && _data.keys.length > 5 ? FittedBox(
-                      child: Row(
-                        children: [
-                          Text("+${_data.keys.length-5}"),
-                          Icon(Icons.arrow_forward_ios)
-                        ],
+                    trailing: _data.keys.length > 5 ? FittedBox(
+                      child: FittedBox(
+                        fit: BoxFit.fill,
+                        child: Row(
+                          children: [
+                            Text("+${_data.keys.length-5}"),
+                            Icon(Icons.arrow_forward_ios)
+                          ],
+                        ),
                       ),
-                    ) : Container(),
+                    ) : Icon(Icons.keyboard_arrow_down_outlined),
                   ),
                   Container(
                     padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
@@ -230,10 +234,10 @@ class _ArtistPageState extends State<ArtistPage> {
                         child: Container(
                           clipBehavior: Clip.antiAlias,
                           decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8)
+                              borderRadius: BorderRadius.circular(20)
                           ),
-                          width: 120,
-                          height: 120,
+                          width: 110,
+                          height: 110,
                           child: Stack(
                             clipBehavior: Clip.antiAliasWithSaveLayer,
                             children: [
@@ -241,8 +245,8 @@ class _ArtistPageState extends State<ArtistPage> {
                                 borderRadius: BorderRadius.circular(4),
                                 child: _data[element][1][1] is String ? Image.network(
                                   _data[element][1][1],
-                                  width: 120,
-                                  height: 120,
+                                  width: 110,
+                                  height: 110,
                                   fit: BoxFit.cover,
                                 ) : Container(),
                               ),

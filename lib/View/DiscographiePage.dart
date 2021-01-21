@@ -19,8 +19,10 @@ class _DiscographiePageState extends State<DiscographiePage> {
     // TODO: implement build
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Color.fromRGBO(245, 245, 245, 1),
+        elevation: 1,
         title: Text(
-          "${widget.artist} - Disco",
+          "${widget.artist} - Discographie",
           style: TextStyle(
             color: Colors.black54
           ),
