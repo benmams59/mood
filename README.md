@@ -1,6 +1,7 @@
 # mood
 
-A online music streamer.
+Mood is an open source online application that gives you the ability to listen 
+to thousands of music catalogs. Type exactly what you are looking for and like!
 
 ## Getting Started
 
